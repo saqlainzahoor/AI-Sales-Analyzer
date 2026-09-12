@@ -24,3 +24,15 @@ plt.ylabel("Total Sales")
 plt.title("Sales by Product")
 plt.xticks(rotation=45)
 plt.show()
+from sklearn.linear_model import LinearRegression
+
+X = data[["Quantity", "Price"]]
+y = data["Total_Sales"]
+
+model = LinearRegression()
+model.fit(X, y)
+
+prediction = model.predict([[10, 80000]])
+
+print("\n--- AI Sales Prediction ---")
+print("Predicted Sales:", prediction[0])
