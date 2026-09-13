@@ -76,6 +76,7 @@ Using the current practice dataset, the model produces approximately:
 * R² Score: `0.9752`
 
 > Note: This is a small synthetic practice dataset created for learning and portfolio development. These metrics should not be interpreted as real-world business performance.
+
 ## Project Screenshots
 
 ### Sales Summary
@@ -90,27 +91,6 @@ Using the current practice dataset, the model produces approximately:
 
 ![Sales Graph](sales_graph.png)
 
-
-
-## Example Prediction
-
-```text
-Product: Laptop
-Quantity: 10
-Price: 80000
-Discount: 5%
-Region: Lahore
-Advertising Spend: 25000
-Customer Type: Business
-
-Predicted Sales: 453,488.09
-```
-```markdown
-### AI Sales Prediction
-
-![AI Sales Prediction](prediction.png)
-```
-
 ## Project Structure
 
 ```text
@@ -118,7 +98,12 @@ AI-Sales-Analyzer/
 │
 ├── main.py
 ├── sales_data.csv
-└── README.md
+├── requirements.txt
+├── .gitignore
+├── README.md
+├── sales_summary.png
+├── prediction.png
+└── sales_graph.png
 ```
 
 ## How to Run
