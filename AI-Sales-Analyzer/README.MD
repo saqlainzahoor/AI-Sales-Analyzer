@@ -76,6 +76,19 @@ Using the current practice dataset, the model produces approximately:
 * R² Score: `0.9752`
 
 > Note: This is a small synthetic practice dataset created for learning and portfolio development. These metrics should not be interpreted as real-world business performance.
+## Project Screenshots
+
+### Sales Summary
+
+![Sales Summary](sales_summary.png)
+
+### AI Sales Prediction
+
+![AI Sales Prediction](prediction.png)
+
+### Sales Graph
+
+![Sales Graph](sales_graph.png)
 
 ## Example Prediction
 
