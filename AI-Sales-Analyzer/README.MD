@@ -90,6 +90,8 @@ Using the current practice dataset, the model produces approximately:
 
 ![Sales Graph](sales_graph.png)
 
+
+
 ## Example Prediction
 
 ```text
@@ -97,11 +99,16 @@ Product: Laptop
 Quantity: 10
 Price: 80000
 Discount: 5%
-Region: Karachi
-Advertising Spend: 30000
+Region: Lahore
+Advertising Spend: 25000
 Customer Type: Business
 
-Predicted Sales: 576,172.75
+Predicted Sales: 453,488.09
+```
+```markdown
+### AI Sales Prediction
+
+![AI Sales Prediction](prediction.png)
 ```
 
 ## Project Structure
