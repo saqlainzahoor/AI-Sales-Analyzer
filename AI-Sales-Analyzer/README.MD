@@ -1,70 +1,145 @@
-AI Sales Analyzer
+# AI Sales Analyzer
 
-A Python-based sales analysis and machine learning project that analyzes sales data, visualizes product performance, and predicts sales using Linear Regression.
+A Python-based sales analysis and machine learning project that analyzes sales data, visualizes product performance, and predicts expected sales using Linear Regression.
 
-Features
-Reads sales data from CSV
-Calculates total sales revenue
-Identifies the best-selling product
-Displays a sales summary
-Creates a sales visualization
-Predicts sales based on quantity and price
-Evaluates the machine learning model using MAE and R² Score
-Technologies
-Python
-Pandas
-NumPy
-Matplotlib
-Scikit-learn
+## Project Overview
+
+AI Sales Analyzer is a portfolio project demonstrating how Python, data analysis, visualization, and machine learning can be combined to solve a simple business problem.
+
+The project analyzes historical sales data and uses a machine learning model to estimate sales based on product, quantity, price, discount, region, advertising spend, and customer type.
+
+## Features
+
+* Load and analyze sales data from CSV
+* Calculate total sales revenue
+* Identify the best-performing product
+* Generate product sales visualization
+* Preprocess categorical and numerical features
+* Train a Linear Regression model
+* Predict expected sales for new inputs
+* Evaluate model performance using MAE and R² Score
+
+## Technologies
+
+* Python
+* Pandas
+* NumPy
+* Matplotlib
+* Scikit-learn
+* Linear Regression
+* Git
+* GitHub
+
+## Machine Learning Workflow
+
+```text
+Sales Data
+    ↓
+Data Loading
+    ↓
+Data Analysis
+    ↓
+Feature Preparation
+    ↓
+Categorical Encoding
+    ↓
+Train/Test Split
+    ↓
 Linear Regression
-Project Structure
+    ↓
+Sales Prediction
+    ↓
+Model Evaluation
+```
+
+## Machine Learning Features
+
+The model uses the following features:
+
+* Product
+* Quantity
+* Price
+* Discount
+* Region
+* Advertising Spend
+* Customer Type
+
+Target variable:
+
+* Total Sales
+
+## Model Evaluation
+
+Using the current practice dataset, the model produces approximately:
+
+* Mean Absolute Error: `35,318.50`
+* R² Score: `0.9752`
+
+> Note: This is a small synthetic practice dataset created for learning and portfolio development. These metrics should not be interpreted as real-world business performance.
+
+## Example Prediction
+
+```text
+Product: Laptop
+Quantity: 10
+Price: 80000
+Discount: 5%
+Region: Karachi
+Advertising Spend: 30000
+Customer Type: Business
+
+Predicted Sales: 576,172.75
+```
+
+## Project Structure
+
+```text
 AI-Sales-Analyzer/
 │
 ├── main.py
 ├── sales_data.csv
 └── README.md
-How It Works
-Sales data is loaded from sales_data.csv.
-Total sales are calculated using quantity and price.
-The program generates a sales summary.
-A bar chart visualizes sales by product.
-A Linear Regression model is trained using quantity and price.
-The user enters quantity and price for a new prediction.
-The model predicts the expected sales amount.
-Model performance is evaluated using MAE and R² Score.
-Example
-==============================
-       AI SALES PREDICTION
-==============================
+```
 
-Enter Quantity: 10
-Enter Price: 80000
+## How to Run
 
-Predicted Sales: 596,494.91
-Model Evaluation
+Install the required libraries:
 
-The current practice dataset produces approximately:
+```bash
+python -m pip install pandas numpy matplotlib scikit-learn
+```
 
-Mean Absolute Error: 44,574.78
-R² Score: 0.8968
+Run the project:
 
-Note: This project uses a small practice dataset for learning purposes. The model evaluation results should not be interpreted as real-world business performance.
+```bash
+python main.py
+```
 
-Project Purpose
+## Skills Demonstrated
 
-This project was created to practice:
+This project demonstrates practical experience with:
 
-Python programming
-Data analysis
-Data visualization
-Machine learning
-Model evaluation
-Git and GitHub
+* Python programming
+* Data analysis
+* Data visualization
+* Feature preprocessing
+* Machine learning
+* Regression
+* Model evaluation
+* Git and GitHub
+* Building a portfolio project
 
-It is part of my portfolio development for an AI/ML career.
+## Future Improvements
 
-Author
+* Add more historical sales data
+* Add date-based features
+* Compare multiple machine learning models
+* Add interactive dashboards
+* Build a web interface using Streamlit
+* Deploy the application online
 
-Saqlain Zahoor
+## Author
 
-GitHub: saqlainzahoor
+**Saqlain Zahoor**
+
+GitHub: `saqlainzahoor`
