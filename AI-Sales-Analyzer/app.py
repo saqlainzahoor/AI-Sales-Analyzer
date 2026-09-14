@@ -102,7 +102,7 @@ st.markdown(
 @st.cache_data
 def load_data():
 
-    df = pd.read_csv("sales_data.csv")
+    df = pd.read_csv("AI-Sales-Analyzer/sales_data.csv")
 
     df["Date"] = pd.to_datetime(
         df["Date"],
