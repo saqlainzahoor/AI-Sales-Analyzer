@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
@@ -18,7 +19,7 @@ st.set_page_config(
     page_title="AI Sales Analyzer",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 
@@ -29,7 +30,6 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
@@ -88,10 +88,9 @@ st.markdown(
         font-weight: 800;
         margin-top: 8px;
     }
-
     </style>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 
@@ -99,15 +98,44 @@ st.markdown(
 # LOAD DATA
 # =========================================================
 
+BASE_DIR = Path(__file__).resolve().parent
+DATA_FILE = BASE_DIR / "sales_data.csv"
+
+
 @st.cache_data
 def load_data():
+    if not DATA_FILE.exists():
+        st.error(f"Sales data file not found: {DATA_FILE}")
+        st.stop()
 
-    df = pd.read_csv("AI-Sales-Analyzer/sales_data.csv")
+    df = pd.read_csv(DATA_FILE)
 
-    df["Date"] = pd.to_datetime(
-        df["Date"],
-        errors="coerce"
-    )
+    required_columns = [
+        "Date",
+        "Product",
+        "Quantity",
+        "Price",
+        "Discount",
+        "Region",
+        "Advertising_Spend",
+        "Customer_Type",
+        "Total_Sales",
+    ]
+
+    missing_columns = [
+        column for column in required_columns
+        if column not in df.columns
+    ]
+
+    if missing_columns:
+        st.error(
+            "Missing columns in sales_data.csv: "
+            + ", ".join(missing_columns)
+        )
+        st.stop()
+
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    df = df.dropna(subset=["Date"]).copy()
 
     return df
 
@@ -126,66 +154,49 @@ features = [
     "Discount",
     "Region",
     "Advertising_Spend",
-    "Customer_Type"
+    "Customer_Type",
 ]
 
 X = data[features]
 y = data["Total_Sales"]
 
-
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
     test_size=0.2,
-    random_state=42
+    random_state=42,
 )
-
 
 categorical_features = [
     "Product",
     "Region",
-    "Customer_Type"
+    "Customer_Type",
 ]
-
 
 preprocessor = ColumnTransformer(
     transformers=[
         (
             "categorical",
             OneHotEncoder(handle_unknown="ignore"),
-            categorical_features
+            categorical_features,
         )
     ],
-    remainder="passthrough"
+    remainder="passthrough",
 )
-
 
 model = Pipeline(
     steps=[
         ("preprocessor", preprocessor),
-        ("regressor", LinearRegression())
+        ("regressor", LinearRegression()),
     ]
 )
 
-
 model.fit(X_train, y_train)
-
-
-# =========================================================
-# MODEL EVALUATION
-# =========================================================
 
 y_pred = model.predict(X_test)
 
-mae = mean_absolute_error(
-    y_test,
-    y_pred
-)
-
-r2 = r2_score(
-    y_test,
-    y_pred
-)
+mae = mean_absolute_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
 
 
 # =========================================================
@@ -193,12 +204,8 @@ r2 = r2_score(
 # =========================================================
 
 with st.sidebar:
-
     st.markdown("## 📊 AI Sales Analyzer")
-
-    st.caption(
-        "Sales Intelligence Dashboard"
-    )
+    st.caption("Sales Intelligence Dashboard")
 
     st.divider()
 
@@ -208,8 +215,8 @@ with st.sidebar:
             "Dashboard",
             "AI Prediction",
             "Sales Data",
-            "Model Performance"
-        ]
+            "Model Performance",
+        ],
     )
 
     st.divider()
@@ -223,38 +230,33 @@ with st.sidebar:
         "Date Range",
         value=(min_date, max_date),
         min_value=min_date,
-        max_value=max_date
+        max_value=max_date,
     )
 
     product_filter = st.multiselect(
         "Product",
-        sorted(data["Product"].unique()),
-        default=[]
+        sorted(data["Product"].dropna().unique()),
     )
 
     region_filter = st.multiselect(
         "Region",
-        sorted(data["Region"].unique()),
-        default=[]
+        sorted(data["Region"].dropna().unique()),
     )
 
     customer_filter = st.multiselect(
         "Customer Type",
-        sorted(data["Customer_Type"].unique()),
-        default=[]
+        sorted(data["Customer_Type"].dropna().unique()),
     )
 
     st.divider()
 
     st.markdown("### Project")
-
     st.write("Python")
     st.write("Pandas")
     st.write("Scikit-learn")
     st.write("Streamlit")
 
     st.divider()
-
     st.caption("Portfolio Project")
 
 
@@ -264,9 +266,7 @@ with st.sidebar:
 
 filtered_data = data.copy()
 
-
 if len(date_range) == 2:
-
     start_date = pd.Timestamp(date_range[0])
     end_date = pd.Timestamp(date_range[1])
 
@@ -275,23 +275,17 @@ if len(date_range) == 2:
         & (filtered_data["Date"] <= end_date)
     ]
 
-
 if product_filter:
-
     filtered_data = filtered_data[
         filtered_data["Product"].isin(product_filter)
     ]
 
-
 if region_filter:
-
     filtered_data = filtered_data[
         filtered_data["Region"].isin(region_filter)
     ]
 
-
 if customer_filter:
-
     filtered_data = filtered_data[
         filtered_data["Customer_Type"].isin(customer_filter)
     ]
@@ -303,14 +297,14 @@ if customer_filter:
 
 st.markdown(
     '<div class="main-title">📊 AI Sales Analyzer</div>',
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 st.markdown(
     '<div class="subtitle">'
-    'Sales analytics, business insights and AI-powered prediction'
-    '</div>',
-    unsafe_allow_html=True
+    "Sales analytics, business insights and AI-powered prediction"
+    "</div>",
+    unsafe_allow_html=True,
 )
 
 
@@ -323,214 +317,127 @@ if page == "Dashboard":
     st.subheader("Business Overview")
 
     if filtered_data.empty:
-
-        st.warning(
-            "No sales data found for the selected filters."
-        )
-
+        st.warning("No sales data found for the selected filters.")
     else:
-
-        total_revenue = filtered_data[
-            "Total_Sales"
-        ].sum()
-
+        total_revenue = filtered_data["Total_Sales"].sum()
         total_orders = len(filtered_data)
-
-        average_sales = filtered_data[
-            "Total_Sales"
-        ].mean()
+        average_sales = filtered_data["Total_Sales"].mean()
 
         best_product = (
-            filtered_data
-            .groupby("Product")["Total_Sales"]
+            filtered_data.groupby("Product")["Total_Sales"]
             .sum()
             .idxmax()
         )
 
-        # =================================================
-        # KPI CARDS
-        # =================================================
-
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-
             st.markdown(
                 f"""
                 <div class="metric-card">
-                    <div class="metric-label">
-                        💰 Total Revenue
-                    </div>
-                    <div class="metric-value">
-                        {total_revenue:,.0f}
-                    </div>
+                    <div class="metric-label">💰 Total Revenue</div>
+                    <div class="metric-value">{total_revenue:,.0f}</div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
         with col2:
-
             st.markdown(
                 f"""
                 <div class="metric-card">
-                    <div class="metric-label">
-                        🧾 Total Orders
-                    </div>
-                    <div class="metric-value">
-                        {total_orders}
-                    </div>
+                    <div class="metric-label">🧾 Total Orders</div>
+                    <div class="metric-value">{total_orders}</div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
         with col3:
-
             st.markdown(
                 f"""
                 <div class="metric-card">
-                    <div class="metric-label">
-                        📦 Best Product
-                    </div>
-                    <div class="metric-value">
-                        {best_product}
-                    </div>
+                    <div class="metric-label">📦 Best Product</div>
+                    <div class="metric-value">{best_product}</div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
         with col4:
-
             st.markdown(
                 f"""
                 <div class="metric-card">
-                    <div class="metric-label">
-                        📊 Average Sale
-                    </div>
-                    <div class="metric-value">
-                        {average_sales:,.0f}
-                    </div>
+                    <div class="metric-label">📊 Average Sale</div>
+                    <div class="metric-value">{average_sales:,.0f}</div>
                 </div>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
-
         st.write("")
-
-
-        # =================================================
-        # CHART 1 - PRODUCT SALES
-        # =================================================
 
         chart1, chart2 = st.columns(2)
 
         with chart1:
-
             st.markdown("### 📈 Sales by Product")
 
             product_sales = (
-                filtered_data
-                .groupby("Product")["Total_Sales"]
+                filtered_data.groupby("Product")["Total_Sales"]
                 .sum()
                 .sort_values(ascending=False)
             )
 
-            fig, ax = plt.subplots(
-                figsize=(8, 5)
-            )
-
-            ax.bar(
-                product_sales.index,
-                product_sales.values
-            )
-
+            fig, ax = plt.subplots(figsize=(8, 5))
+            ax.bar(product_sales.index, product_sales.values)
             ax.set_xlabel("Product")
             ax.set_ylabel("Total Sales")
-            ax.tick_params(
-                axis="x",
-                rotation=45
-            )
-
-            plt.tight_layout()
+            ax.tick_params(axis="x", rotation=45)
+            fig.tight_layout()
 
             st.pyplot(fig)
-
             plt.close(fig)
 
-
-        # =================================================
-        # CHART 2 - REGION SALES
-        # =================================================
-
         with chart2:
-
             st.markdown("### 🌍 Sales by Region")
 
             region_sales = (
-                filtered_data
-                .groupby("Region")["Total_Sales"]
+                filtered_data.groupby("Region")["Total_Sales"]
                 .sum()
                 .sort_values(ascending=False)
             )
 
-            fig, ax = plt.subplots(
-                figsize=(8, 5)
-            )
-
-            ax.bar(
-                region_sales.index,
-                region_sales.values
-            )
-
+            fig, ax = plt.subplots(figsize=(8, 5))
+            ax.bar(region_sales.index, region_sales.values)
             ax.set_xlabel("Region")
             ax.set_ylabel("Total Sales")
-            ax.tick_params(
-                axis="x",
-                rotation=45
-            )
-
-            plt.tight_layout()
+            ax.tick_params(axis="x", rotation=45)
+            fig.tight_layout()
 
             st.pyplot(fig)
-
             plt.close(fig)
-
-
-        # =================================================
-        # SALES TREND
-        # =================================================
 
         st.markdown("### 📅 Sales Trend")
 
         daily_sales = (
-            filtered_data
-            .groupby("Date")["Total_Sales"]
+            filtered_data.groupby("Date")["Total_Sales"]
             .sum()
+            .sort_index()
         )
 
-        fig, ax = plt.subplots(
-            figsize=(12, 5)
-        )
-
+        fig, ax = plt.subplots(figsize=(12, 5))
         ax.plot(
             daily_sales.index,
             daily_sales.values,
-            marker="o"
+            marker="o",
         )
-
         ax.set_xlabel("Date")
         ax.set_ylabel("Sales")
         ax.set_title("Sales Trend Over Time")
-
-        plt.xticks(rotation=45)
-
-        plt.tight_layout()
+        fig.autofmt_xdate()
+        fig.tight_layout()
 
         st.pyplot(fig)
-
         plt.close(fig)
 
 
@@ -550,26 +457,24 @@ elif page == "AI Prediction":
 
     col1, col2 = st.columns(2)
 
-
     with col1:
-
         product = st.selectbox(
             "Product",
-            sorted(data["Product"].unique())
+            sorted(data["Product"].dropna().unique()),
         )
 
         quantity = st.number_input(
             "Quantity",
             min_value=1.0,
             value=10.0,
-            step=1.0
+            step=1.0,
         )
 
         price = st.number_input(
             "Price",
             min_value=0.0,
             value=80000.0,
-            step=1000.0
+            step=1000.0,
         )
 
         discount = st.number_input(
@@ -577,85 +482,60 @@ elif page == "AI Prediction":
             min_value=0.0,
             max_value=100.0,
             value=5.0,
-            step=1.0
+            step=1.0,
         )
 
-
     with col2:
-
         region = st.selectbox(
             "Region",
-            sorted(data["Region"].unique())
+            sorted(data["Region"].dropna().unique()),
         )
 
         advertising_spend = st.number_input(
             "Advertising Spend",
             min_value=0.0,
             value=25000.0,
-            step=1000.0
+            step=1000.0,
         )
 
         customer_type = st.selectbox(
             "Customer Type",
-            sorted(data["Customer_Type"].unique())
+            sorted(data["Customer_Type"].dropna().unique()),
         )
-
 
     st.write("")
 
-
     if st.button(
         "🔮 Predict Sales",
-        use_container_width=True
+        use_container_width=True,
     ):
-
-        new_data = pd.DataFrame({
-
-            "Product": [product],
-
-            "Quantity": [quantity],
-
-            "Price": [price],
-
-            "Discount": [discount],
-
-            "Region": [region],
-
-            "Advertising_Spend": [
-                advertising_spend
-            ],
-
-            "Customer_Type": [
-                customer_type
-            ]
-        })
-
-
-        prediction = model.predict(
-            new_data
-        )[0]
-
-
-        st.markdown(
-            f"""
-            <div class="prediction-card">
-
-                <div class="prediction-label">
-                    Estimated Sales
-                </div>
-
-                <div class="prediction-value">
-                    {prediction:,.2f}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
+        new_data = pd.DataFrame(
+            {
+                "Product": [product],
+                "Quantity": [quantity],
+                "Price": [price],
+                "Discount": [discount],
+                "Region": [region],
+                "Advertising_Spend": [advertising_spend],
+                "Customer_Type": [customer_type],
+            }
         )
 
+        prediction = float(model.predict(new_data)[0])
 
-        st.success(
-            "Prediction generated successfully."
+        # Sales cannot be negative.
+        prediction = max(0.0, prediction)
+
+        st.success("Prediction generated successfully.")
+
+        st.metric(
+            label="💰 Estimated Sales",
+            value=f"{prediction:,.2f}",
+        )
+
+        st.caption(
+            "This prediction is generated by the Linear Regression "
+            "model trained on the current practice dataset."
         )
 
 
@@ -671,29 +551,27 @@ elif page == "Sales Data":
         "Explore the sales records used by the application."
     )
 
-    st.dataframe(
-        filtered_data,
-        use_container_width=True,
-        hide_index=True
-    )
+    if filtered_data.empty:
+        st.warning("No data matches the selected filters.")
+    else:
+        st.dataframe(
+            filtered_data,
+            use_container_width=True,
+            hide_index=True,
+        )
 
+        st.divider()
 
-    st.divider()
+        csv_data = filtered_data.to_csv(index=False)
 
+        st.download_button(
+            label="📥 Download Filtered Data",
+            data=csv_data,
+            file_name="filtered_sales_data.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
 
-    # DOWNLOAD BUTTON
-
-    csv_data = filtered_data.to_csv(
-        index=False
-    )
-
-    st.download_button(
-        label="📥 Download Filtered Data",
-        data=csv_data,
-        file_name="filtered_sales_data.csv",
-        mime="text/csv",
-        use_container_width=True
-    )
 
 # =========================================================
 # MODEL PERFORMANCE
@@ -714,67 +592,31 @@ elif page == "Model Performance":
     with col1:
         st.metric(
             label="Mean Absolute Error",
-            value=f"{mae:,.2f}"
+            value=f"{mae:,.2f}",
         )
 
     with col2:
         st.metric(
             label="R² Score",
-            value=f"{r2:.4f}"
+            value=f"{r2:.4f}",
         )
 
     st.write("")
 
-    # =========================================================
-    # ACTUAL VS PREDICTED
-    # =========================================================
-
     st.markdown("### 🔬 Actual vs Predicted Sales")
 
-    comparison = pd.DataFrame({
-        "Actual Sales": y_test.values,
-        "Predicted Sales": y_pred
-    })
+    comparison = pd.DataFrame(
+        {
+            "Actual Sales": y_test.values,
+            "Predicted Sales": y_pred,
+        }
+    )
 
     st.dataframe(
         comparison,
         use_container_width=True,
-        hide_index=True
+        hide_index=True,
     )
-
-    st.info(
-        "This project uses a small synthetic practice dataset "
-        "created for learning and portfolio development. "
-        "The model metrics should not be interpreted as "
-        "real-world business performance."
-    )
-        
-
-
-    st.write("")
-
-
-    # ACTUAL VS PREDICTED
-
-    st.markdown(
-        "### 🔬 Actual vs Predicted Sales"
-    )
-
-    comparison = pd.DataFrame({
-
-        "Actual Sales": y_test.values,
-
-        "Predicted Sales": y_pred
-
-    })
-
-
-    st.dataframe(
-        comparison,
-        use_container_width=True,
-        hide_index=True
-    )
-
 
     st.info(
         "This project uses a small synthetic practice dataset "
