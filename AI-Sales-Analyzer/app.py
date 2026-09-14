@@ -695,7 +695,6 @@ elif page == "Sales Data":
         use_container_width=True
     )
 
-
 # =========================================================
 # MODEL PERFORMANCE
 # =========================================================
@@ -710,48 +709,46 @@ elif page == "Model Performance":
 
     st.divider()
 
-
     col1, col2 = st.columns(2)
 
-
     with col1:
-
-        st.markdown(
-            f"""
-            <div class="metric-card">
-
-                <div class="metric-label">
-                    Mean Absolute Error
-                </div>
-
-                <div class="metric-value">
-                    {mae:,.2f}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.metric(
+            label="Mean Absolute Error",
+            value=f"{mae:,.2f}"
         )
-
 
     with col2:
-
-        st.markdown(
-            f"""
-            <div class="metric-card">
-
-                <div class="metric-label">
-                    R² Score
-                </div>
-
-                <div class="metric-value">
-                    {r2:.4f}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.metric(
+            label="R² Score",
+            value=f"{r2:.4f}"
         )
+
+    st.write("")
+
+    # =========================================================
+    # ACTUAL VS PREDICTED
+    # =========================================================
+
+    st.markdown("### 🔬 Actual vs Predicted Sales")
+
+    comparison = pd.DataFrame({
+        "Actual Sales": y_test.values,
+        "Predicted Sales": y_pred
+    })
+
+    st.dataframe(
+        comparison,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.info(
+        "This project uses a small synthetic practice dataset "
+        "created for learning and portfolio development. "
+        "The model metrics should not be interpreted as "
+        "real-world business performance."
+    )
+        
 
 
     st.write("")
